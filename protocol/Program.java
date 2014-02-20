@@ -24,7 +24,7 @@ public class Program {
 	private static IMACProtocol protocol = new UberProtocol();
 
 	// Challenge server address
-	private static String serverAddress = "dacs-stud03.ewi.utwente.nl";
+	private static String serverAddress = "130.89.235.123";
 
 	// Challenge server port
 	private static int serverPort = 8001;

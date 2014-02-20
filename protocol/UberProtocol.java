@@ -14,7 +14,6 @@ public class UberProtocol implements IMACProtocol {
     public static final Random RANDOM = new Random();
 
     private static final int CONTROL_MESSAGE_IDENTIFY = 1;
-    private static final int CONTROL_MESSAGE_DONE = 2;
 
     private int state = STATE_IDENTIFYING;
     private int slot = 0;
