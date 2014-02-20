@@ -26,6 +26,7 @@ public class UberProtocol implements IMACProtocol {
     private int clients;
     private boolean hadData = false;
     private boolean claiming = false;
+    private int[] qLen;
 
     @Override
     public TransmissionInfo TimeslotAvailable(MediumState previousMediumState, int controlInformation, int localQueueLength) {
@@ -37,6 +38,7 @@ public class UberProtocol implements IMACProtocol {
             if(slot >= maxIdentification) {
                 state = STATE_SENDING;
                 clients = currentId;
+                qLen = new int[clients];
             }
         } else if(state == STATE_SENDING) {
             info = send(previousMediumState, controlInformation, localQueueLength);
@@ -48,30 +50,43 @@ public class UberProtocol implements IMACProtocol {
     }
 
     private TransmissionInfo send(MediumState previousMediumState, int controlInformation, int localQueueLength) {
-//        if(controlInformation >= CONTROL_MESSAGE_DONE) {
-//            if(id > controlInformation - CONTROL_MESSAGE_DONE) {
-//                id--;
-//            }
-//
-//            if(clients > 1) {
-//                clients--;
-//            }
-//        }
+        try {
+        System.out.print(slot + ": ");
+        for(int i = 0; i < clients; i++) {
+            qLen[i]++;
+            System.out.print(qLen[i] + " ");
+        }
 
-        if(slot % clients == id) {
-            if(localQueueLength != 0) {
-                hadData = true;
-                return new TransmissionInfo(TransmissionType.Data, 0);
+        if(previousMediumState == MediumState.Succes) {
+            int client = controlInformation % clients;
+            int qLen = controlInformation / clients;
+            this.qLen[client] = qLen;
+        }
+
+        int biggest = -1;
+        int biggestValue = -1;
+
+        for(int i = 0; i < clients; i++) {
+            if(this.qLen[i] > biggestValue) {
+                biggest = i;
+                biggestValue = this.qLen[biggest];
+            }
+        }
+
+        System.out.println(" -> " + biggest + " at " + biggestValue);
+
+        if(biggest == id) {
+            if(localQueueLength == 0) {
+                return new TransmissionInfo(TransmissionType.NoData, id + clients * localQueueLength);
             } else {
-                if(hadData) {
-                    hadData = false;
-                    return new TransmissionInfo(TransmissionType.NoData, CONTROL_MESSAGE_DONE + id);
-                } else {
-                    return new TransmissionInfo(TransmissionType.Silent, 0);
-                }
+                return new TransmissionInfo(TransmissionType.Data, id + clients * localQueueLength);
             }
         } else {
             return new TransmissionInfo(TransmissionType.Silent, 0);
+        }
+        } catch(ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
