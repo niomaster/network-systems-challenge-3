@@ -48,15 +48,15 @@ public class UberProtocol implements IMACProtocol {
     }
 
     private TransmissionInfo send(MediumState previousMediumState, int controlInformation, int localQueueLength) {
-        if(controlInformation >= CONTROL_MESSAGE_DONE) {
-            if(id > controlInformation - CONTROL_MESSAGE_DONE) {
-                id--;
-            }
-
-            if(clients > 1) {
-                clients--;
-            }
-        }
+//        if(controlInformation >= CONTROL_MESSAGE_DONE) {
+//            if(id > controlInformation - CONTROL_MESSAGE_DONE) {
+//                id--;
+//            }
+//
+//            if(clients > 1) {
+//                clients--;
+//            }
+//        }
 
         if(slot % clients == id) {
             if(localQueueLength != 0) {
